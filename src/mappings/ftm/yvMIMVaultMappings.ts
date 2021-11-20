@@ -20,7 +20,7 @@ import {
   StrategyAddedToQueue as StrategyAddedToQueueEvent,
   StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
   UpdateRewards as UpdateRewardsEvent,
-} from '../../../generated/ftmYvMIMVault/Vault';
+} from '../../../generated/ftmRvMIMVault/Vault';
 import { Strategy, Transaction, Vault } from '../../../generated/schema';
 import { isEventBlockNumberLt, printCallInfo } from '../../utils/commons';
 import {
@@ -56,7 +56,7 @@ function createFTMYvMIMVaultIfNeeded(
 export function handleAddStrategyV2(call: AddStrategyV2Call): void {
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_AddStrategyV2(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
+      'ftmRvMIMVault_AddStrategyV2(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -67,14 +67,14 @@ export function handleAddStrategyV2(call: AddStrategyV2Call): void {
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_AddStrategyV2Call',
+      'ftmRvMIMVault_AddStrategyV2Call',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_AddStrategyV2Call'
+      'ftmRvMIMVault_AddStrategyV2Call'
     );
 
     strategyLibrary.createAndGet(
@@ -95,7 +95,7 @@ export function handleAddStrategyV2(call: AddStrategyV2Call): void {
 export function handleAddStrategy(call: AddStrategyV1Call): void {
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_AddStrategy(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
+      'ftmRvMIMVault_AddStrategy(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -106,14 +106,14 @@ export function handleAddStrategy(call: AddStrategyV1Call): void {
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_AddStrategyCall',
+      'ftmRvMIMVault_AddStrategyCall',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_AddStrategyCall'
+      'ftmRvMIMVault_AddStrategyCall'
     );
 
     strategyLibrary.createAndGet(
@@ -141,7 +141,7 @@ export function handleStrategyReported_v0_3_0_v0_3_1(
 ): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_StrategyReportedEvent',
+      'ftmRvMIMVault_StrategyReportedEvent',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
@@ -149,7 +149,7 @@ export function handleStrategyReported_v0_3_0_v0_3_1(
     log.info('[Vault mappings v0_3_0 and v0_3_1] Handle strategy reported', []);
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_StrategyReportedEvent'
+      'ftmRvMIMVault_StrategyReportedEvent'
     );
     strategyLibrary.createReport(
       ethTransaction,
@@ -192,7 +192,7 @@ export function handleStrategyReported_v0_3_0_v0_3_1(
 export function handleStrategyReported(event: StrategyReportedEvent): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_StrategyReportedEvent',
+      'ftmRvMIMVault_StrategyReportedEvent',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
@@ -200,7 +200,7 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     log.info('[Vault mappings] Handle strategy reported', []);
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_StrategyReportedEvent'
+      'ftmRvMIMVault_StrategyReportedEvent'
     );
 
     strategyLibrary.createReport(
@@ -235,7 +235,7 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
 export function handleStrategyMigrated(event: StrategyMigrated): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_StrategyReportedEvent',
+      'ftmRvMIMVault_StrategyReportedEvent',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
@@ -249,7 +249,7 @@ export function handleStrategyMigrated(event: StrategyMigrated): void {
     );
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_StrategyMigratedEvent'
+      'ftmRvMIMVault_StrategyMigratedEvent'
     );
 
     let oldStrategyAddress = event.params.oldVersion;
@@ -293,7 +293,7 @@ export function handleDeposit(call: DepositCall): void {
 
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Deposit () - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing deposit tx.',
+      'ftmRvMIMVault_Deposit () - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing deposit tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -304,14 +304,14 @@ export function handleDeposit(call: DepositCall): void {
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.deposit()',
+      'ftmRvMIMVault_vault.deposit()',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.deposit()'
+      'ftmRvMIMVault_vault.deposit()'
     );
     createFTMYvMIMVaultIfNeeded(call.to, transaction);
     let vaultContract = VaultContract.bind(call.to);
@@ -344,7 +344,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
   log.debug('[Vault mappings] Handle deposit with amount', []);
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Deposit (amount) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing deposit tx.',
+      'ftmRvMIMVault_Deposit (amount) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing deposit tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -355,7 +355,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.deposit(uint)',
+      'ftmRvMIMVault_vault.deposit(uint)',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
@@ -367,7 +367,7 @@ export function handleDepositWithAmount(call: Deposit1Call): void {
     // registry.vaults(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599, 1) => 0xA696a63cc78DfFa1a63E9E50587C197387FF6C7E
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.deposit(uint)'
+      'ftmRvMIMVault_vault.deposit(uint)'
     );
     createFTMYvMIMVaultIfNeeded(call.to, transaction);
     vaultLibrary.deposit(
@@ -385,7 +385,7 @@ export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
   log.debug('[Vault mappings] Handle deposit with amount and recipient', []);
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Deposit (amount,recipient) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing deposit tx.',
+      'ftmRvMIMVault_Deposit (amount,recipient) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing deposit tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -397,14 +397,14 @@ export function handleDepositWithAmountAndRecipient(call: Deposit2Call): void {
 
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.deposit(uint,address)',
+      'ftmRvMIMVault_vault.deposit(uint,address)',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.deposit(uint,address)'
+      'ftmRvMIMVault_vault.deposit(uint,address)'
     );
     createFTMYvMIMVaultIfNeeded(call.to, transaction);
     log.info(
@@ -443,7 +443,7 @@ export function handleWithdraw(call: WithdrawCall): void {
   ]);
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Withdraw (shares) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
+      'ftmRvMIMVault_Withdraw (shares) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -454,14 +454,14 @@ export function handleWithdraw(call: WithdrawCall): void {
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.withdraw()',
+      'ftmRvMIMVault_vault.withdraw()',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.withdraw()'
+      'ftmRvMIMVault_vault.withdraw()'
     );
     log.info('[Vault mappings] Handle withdraw(): Vault address {}', [
       call.to.toHexString(),
@@ -493,7 +493,7 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
   ]);
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Withdraw (shares) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
+      'ftmRvMIMVault_Withdraw (shares) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -504,14 +504,14 @@ export function handleWithdrawWithShares(call: Withdraw1Call): void {
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.withdraw(uint256)',
+      'ftmRvMIMVault_vault.withdraw(uint256)',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.withdraw(uint256)'
+      'ftmRvMIMVault_vault.withdraw(uint256)'
     );
     log.info('[Vault mappings] Handle withdraw(shares): Vault address {}', [
       call.to.toHexString(),
@@ -537,7 +537,7 @@ export function handleWithdrawWithSharesAndRecipient(
   );
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Withdraw (shares,recipient) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
+      'ftmRvMIMVault_Withdraw (shares,recipient) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -549,14 +549,14 @@ export function handleWithdrawWithSharesAndRecipient(
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.withdraw(uint256,address)',
+      'ftmRvMIMVault_vault.withdraw(uint256,address)',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.withdraw(uint256,address)'
+      'ftmRvMIMVault_vault.withdraw(uint256,address)'
     );
     log.info(
       '[Vault mappings] Handle withdraw(shares, recipient): TX: {} Vault address {} Shares: {} Recipient: {} From: {}',
@@ -597,7 +597,7 @@ export function handleWithdrawWithSharesAndRecipientAndMaxLoss(
   );
   if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
     log.warning(
-      'ftmYvMIMVault_Withdraw (shares,recipient,maxLoss) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
+      'ftmRvMIMVault_Withdraw (shares,recipient,maxLoss) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing withdraw tx.',
       [
         call.transaction.hash.toHexString(),
         call.to.toHexString(),
@@ -609,14 +609,14 @@ export function handleWithdrawWithSharesAndRecipientAndMaxLoss(
   }
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.withdraw(uint256,address,uint256)',
+      'ftmRvMIMVault_vault.withdraw(uint256,address,uint256)',
       call.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let transaction = getOrCreateTransactionFromCall(
       call,
-      'ftmYvMIMVault_vault.withdraw(uint256,address,uint256)'
+      'ftmRvMIMVault_vault.withdraw(uint256,address,uint256)'
     );
     log.info(
       '[Vault mappings] Handle withdraw(shares, recipient, maxLoss): Vault address {}',
@@ -652,7 +652,7 @@ export function handleTransfer(event: TransferEvent): void {
 
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_vault.transfer(address,uint256)',
+      'ftmRvMIMVault_vault.transfer(address,uint256)',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
@@ -671,7 +671,7 @@ export function handleTransfer(event: TransferEvent): void {
       );
       let transaction = getOrCreateTransactionFromEvent(
         event,
-        'ftmYvMIMVault_vault.transfer(address,uint256)'
+        'ftmRvMIMVault_vault.transfer(address,uint256)'
       );
       createFTMYvMIMVaultIfNeeded(event.address, transaction);
       let vaultContract = VaultContract.bind(event.address);
@@ -709,14 +709,14 @@ export function handleUpdatePerformanceFee(
 ): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_UpdatePerformanceFee',
+      'ftmRvMIMVault_UpdatePerformanceFee',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_UpdatePerformanceFee'
+      'ftmRvMIMVault_UpdatePerformanceFee'
     );
     createFTMYvMIMVaultIfNeeded(event.address, ethTransaction);
 
@@ -736,14 +736,14 @@ export function handleUpdateManagementFee(
 ): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_UpdateManagementFee',
+      'ftmRvMIMVault_UpdateManagementFee',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_UpdateManagementFee'
+      'ftmRvMIMVault_UpdateManagementFee'
     );
     createFTMYvMIMVaultIfNeeded(event.address, ethTransaction);
 
@@ -763,14 +763,14 @@ export function handleStrategyAddedToQueue(
 ): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_StrategyAddedToQueue',
+      'ftmRvMIMVault_StrategyAddedToQueue',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_StrategyAddedToQueue'
+      'ftmRvMIMVault_StrategyAddedToQueue'
     );
 
     vaultLibrary.strategyAddedToQueue(
@@ -786,14 +786,14 @@ export function handleStrategyRemovedFromQueue(
 ): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_StrategyRemovedFromQueue',
+      'ftmRvMIMVault_StrategyRemovedFromQueue',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_StrategyRemovedFromQueue'
+      'ftmRvMIMVault_StrategyRemovedFromQueue'
     );
     vaultLibrary.strategyRemovedFromQueue(
       event.params.strategy,
@@ -806,14 +806,14 @@ export function handleStrategyRemovedFromQueue(
 export function handleUpdateRewards(event: UpdateRewardsEvent): void {
   if (
     isEventBlockNumberLt(
-      'ftmYvMIMVault_UpdateRewardsEvent',
+      'ftmRvMIMVault_UpdateRewardsEvent',
       event.block,
       FTM_YV_MIM_VAULT_END_BLOCK_CUSTOM
     )
   ) {
     let ethTransaction = getOrCreateTransactionFromEvent(
       event,
-      'ftmYvMIMVault_UpdateRewardsEvent'
+      'ftmRvMIMVault_UpdateRewardsEvent'
     );
 
     let vaultContract = VaultContract.bind(event.address);
