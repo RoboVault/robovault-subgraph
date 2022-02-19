@@ -74,3 +74,6 @@ export const API_VERSION_0_3_5 = '0.3.5';
 export const ETH_MAINNET_NETWORK = 'mainnet';
 export const FTM_MAINNET_NETWORK = 'fantom';
 export const ARB_MAINNET_NETWORK = 'arbitrum-one';
+
+// TODO: droidmuncher: Need to figure out the significance of this block number. Setting to something very recent so it doesn't stop data being written
+export const FTM_ROBO_VAULT_V3_USDC_END_BLOCK_CUSTOM = BigInt.fromI32(31384413);
