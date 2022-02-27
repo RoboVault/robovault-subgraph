@@ -4,15 +4,114 @@
 
   "manualVaults": [
     {
-      "name": "RoboVaultV3USDC",
+      "name": "RoboVaultV3USDC_A",
       "address": "0x1B6ecdA7Fd559793c0Def1F1D90A2Df4887B9718",
       "startBlock": "22174421",
-      "mappingFile": "./src/mappings/ftm/roboVaultV3USDCVaultMappings.ts",
+      "mappingFile": "./src/mappings/robo/RoboVaultV3USDC_AVaultMappings.ts",
       "comments": [
-        "RoboVaultV3USDC",
+        "RoboVaultV3USDC_A",
         "Vault: https://ftmscan.com/address/0x1B6ecdA7Fd559793c0Def1F1D90A2Df4887B9718",
-        "Vault created at: #22174421 https://ftmscan.com/tx/0x3c4a775c52f117c43d567a4eceb417eb85069450751331877180af400cd44686"
+        "Vault created at: #22174421"
       ]
+    },
+    {
+        "name": "RoboVaultV3USDC_B",
+        "address": "0xa9BE8Ea19aAC1966fd4a7dCc418d07E0b1716d8C",
+        "startBlock": "21730859",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3USDC_BVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3USDC_B",
+          "Vault: https://ftmscan.com/address/0xa9BE8Ea19aAC1966fd4a7dCc418d07E0b1716d8C",
+          "Vault created at: #21730859"
+        ]
+    },
+    {
+        "name": "RoboVaultV3USDC_C",
+        "address": "0x4d7AE4073657203702258Fd8A6369Fae3D718bD9",
+        "startBlock": "22125419",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3USDC_CVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3USDC_C",
+          "Vault: https://ftmscan.com/address/0x4d7AE4073657203702258Fd8A6369Fae3D718bD9",
+          "Vault created at: #22125419"
+        ]
+    },
+    {
+        "name": "RoboVaultV3MIM",
+        "address": "0x92D2DdF8eed6f2bdB9a7890a00B07a48C9c7A658",
+        "startBlock": "23820347",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3MIMVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3MIM",
+          "Vault: https://ftmscan.com/address/0x92D2DdF8eed6f2bdB9a7890a00B07a48C9c7A658",
+          "Vault created at: #23820347"
+        ]
+    },
+    {
+        "name": "RoboVaultV3WFTM_A",
+        "address": "0x38Da23Ef41333bE0d309Cd63166035FF3b7E2000",
+        "startBlock": "22791328",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3WFTM_AVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3WFTM_A",
+          "Vault: https://ftmscan.com/address/0x38Da23Ef41333bE0d309Cd63166035FF3b7E2000",
+          "Vault created at: #22791328"
+        ]
+    },
+    {
+        "name": "RoboVaultV3WFTM_B",
+        "address": "0xE94Df1Ea87515Dcb5548aB04Ec12FD4C0966064d",
+        "startBlock": "22663829",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3WFTM_BVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3WFTM_B",
+          "Vault: https://ftmscan.com/address/0xE94Df1Ea87515Dcb5548aB04Ec12FD4C0966064d",
+          "Vault created at: #22663829"
+        ]
+    },
+    {
+        "name": "RoboVaultV3WFTM_C",
+        "address": "0x033310d982cB70B63cE3D8AcAbCad6aF5e2a575C",
+        "startBlock": "22788671",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3WFTM_CVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3WFTM_C",
+          "Vault: https://ftmscan.com/address/0x033310d982cB70B63cE3D8AcAbCad6aF5e2a575C",
+          "Vault created at: #22788671"
+        ]
+    },
+    {
+        "name": "RoboVaultV3WBTC",
+        "address": "0x13994411Eda808B354F62db5490B344F431499ae",
+        "startBlock": "28706268",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3WBTCVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3WBTC",
+          "Vault: https://ftmscan.com/address/0x13994411Eda808B354F62db5490B344F431499ae",
+          "Vault created at: #28706268"
+        ]
+    },
+    {
+        "name": "RoboVaultV3WETH",
+        "address": "0x81F0f4fDF5148f09aAE811b5995D94F703ED0963",
+        "startBlock": "28722241",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3WETHVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3WETH",
+          "Vault: https://ftmscan.com/address/0x81F0f4fDF5148f09aAE811b5995D94F703ED0963",
+          "Vault created at: #28722241"
+        ]
+    },
+    {
+        "name": "RoboVaultV3DAI",
+        "address": "0xd10112521e860bdE82FD34f88113052e434930C4",
+        "startBlock": "28730307",
+        "mappingFile": "./src/mappings/robo/RoboVaultV3DAIVaultMappings.ts",
+        "comments": [
+          "RoboVaultV3DAI",
+          "Vault: https://ftmscan.com/address/0xd10112521e860bdE82FD34f88113052e434930C4",
+          "Vault created at: #28730307"
+        ]
     }
   ]
 }

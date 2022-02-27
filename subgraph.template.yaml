@@ -2,47 +2,8 @@ specVersion: 0.0.3
 schema:
   file: ./schema.graphql
 dataSources:
-  # 3. Vaults that had strategies added before they were added to the registry (if applicable)
-  {{#vaultsWithPreregisteredStrategies}}
-  {{#comments}}
-  # {{{.}}}
-  {{/comments}}
-  - kind: ethereum/contract
-    name: {{name}}
-    network: {{network}}
-    source:
-      startBlock: {{startBlock}}
-      address: '{{address}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Transaction
-        - Strategy
-      abis:
-        - name: Registry
-          file: ./abis/Registry.json
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-      eventHandlers:
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-          # V2: StrategyAdded(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - event: StrategyAdded(indexed address,uint256,uint256,uint256,uint256)
-          handler: handleStrategyAddedV2
-      file: {{{mappingFile}}}
-  {{/vaultsWithPreregisteredStrategies}}
+  # Manually Instantiated Vaults (All vaults to be registered using this method until Robo implements a Registry)
 
-  # 4. Manually instantiated vaults. (if applicable)
   {{#manualVaults}}
   {{#comments}}
   # {{{.}}}
