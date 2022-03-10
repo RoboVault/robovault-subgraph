@@ -72,6 +72,20 @@
       "startBlock": "28730307",
       "mappingFile": "./src/mappings/robo/RoboVaultV3DAIVaultMappings.ts",
       "comments": ["RoboVaultV3DAI", "Vault: https://ftmscan.com/address/0xd10112521e860bdE82FD34f88113052e434930C4", "Vault created at: #28730307"]
+    },
+    {
+      "name": "RoboVaultV3USDC_MIM",
+      "address": "0x7ff7751E0a2cf789A035caE3ab79c27fD6B0D6cD",
+      "startBlock": "32008308",
+      "mappingFile": "./src/mappings/robo/RoboVaultV3USDC_MIMVaultMappings.ts",
+      "comments": ["RoboVaultV3USDC_MIM", "Vault: https://ftmscan.com/address/0x7ff7751E0a2cf789A035caE3ab79c27fD6B0D6cD", "Vault created at: #32008308"]
+    },
+    {
+      "name": "RoboVaultV3USDC_FRAX",
+      "address": "0xB41Df11bA7825f5ED2b67899975169432f05234f",
+      "startBlock": "32147555",
+      "mappingFile": "./src/mappings/robo/RoboVaultV3USDC_FRAXVaultMappings.ts",
+      "comments": ["RoboVaultV3USDC_FRAX", "Vault: https://ftmscan.com/address/0xB41Df11bA7825f5ED2b67899975169432f05234f", "Vault created at: #32147555"]
     }
   ]
 }
