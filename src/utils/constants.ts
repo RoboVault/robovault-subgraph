@@ -74,3 +74,5 @@ export const API_VERSION_0_3_5 = '0.3.5';
 export const ETH_MAINNET_NETWORK = 'mainnet';
 export const FTM_MAINNET_NETWORK = 'fantom';
 export const ARB_MAINNET_NETWORK = 'arbitrum-one';
+
+export const ROBO_VAULT_REGISTRY = '0xF97A534300dF63B3ee2a4695836B16435Fea99C0';

@@ -1,4 +1,4 @@
-# Yearn Vaults Subgraph Tests
+# Robo Vault Subgraph Tests
 
 Testing the subgraph is a complicated endeavour given the amount of statefulness in subgraphs and lack of testing tools in the space.
 
