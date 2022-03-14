@@ -1,7 +1,7 @@
 {
   "network": "fantom",
   "callHandlersEnabled": true,
-  
+
   "Registry": "0xF97A534300dF63B3ee2a4695836B16435Fea99C0",
   "startBlock": "32164120",
   "registryV2Enabled": false,
@@ -12,7 +12,12 @@
       "address": "0x1B6ecdA7Fd559793c0Def1F1D90A2Df4887B9718",
       "startBlock": "32163000",
       "mappingFile": "./src/mappings/robo/RoboVaultV3USDC_AVaultMappings.ts",
-      "comments": ["TODO: droidmuncher: THE START BLOCK IS CHANGED FOR TESTING, REMEMBER TO REVERT","RoboVaultV3USDC_A", "Vault: https://ftmscan.com/address/0x1B6ecdA7Fd559793c0Def1F1D90A2Df4887B9718", "Vault created at: #22174421"]
+      "comments": [
+        "TODO: droidmuncher: THE START BLOCK IS CHANGED FOR TESTING, REMEMBER TO REVERT",
+        "RoboVaultV3USDC_A",
+        "Vault: https://ftmscan.com/address/0x1B6ecdA7Fd559793c0Def1F1D90A2Df4887B9718",
+        "Vault created at: #22174421"
+      ]
     }
   ]
 }

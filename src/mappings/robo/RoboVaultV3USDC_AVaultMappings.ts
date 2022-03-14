@@ -17,24 +17,24 @@ import {
   getOrCreateTransactionFromEvent,
 } from '../../utils/transaction';
 import {
-    StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
-    StrategyMigrated,
-    StrategyReported1 as StrategyReportedEvent,
-    Deposit1Call as DepositCall,
-    Transfer as TransferEvent,
-    Withdraw1Call as WithdrawCall,
-    Deposit2Call,
-    Deposit1Call,
-    Withdraw1Call,
-    Withdraw2Call,
-    Withdraw3Call,
-    UpdatePerformanceFee as UpdatePerformanceFeeEvent,
-    UpdateManagementFee as UpdateManagementFeeEvent,
-    StrategyAdded1 as StrategyAddedV2Event,
-    StrategyAddedToQueue as StrategyAddedToQueueEvent,
-    StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
-    UpdateRewards as UpdateRewardsEvent,
-  } from '../../../generated/RoboVaultV3USDC_A/Vault';
+  StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
+  StrategyMigrated,
+  StrategyReported1 as StrategyReportedEvent,
+  Deposit1Call as DepositCall,
+  Transfer as TransferEvent,
+  Withdraw1Call as WithdrawCall,
+  Deposit2Call,
+  Deposit1Call,
+  Withdraw1Call,
+  Withdraw2Call,
+  Withdraw3Call,
+  UpdatePerformanceFee as UpdatePerformanceFeeEvent,
+  UpdateManagementFee as UpdateManagementFeeEvent,
+  StrategyAdded1 as StrategyAddedV2Event,
+  StrategyAddedToQueue as StrategyAddedToQueueEvent,
+  StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
+  UpdateRewards as UpdateRewardsEvent,
+} from '../../../generated/RoboVaultV3USDC_A/Vault';
 
 const VAULT_NAME = 'RoboVaultV3USDC_A';
 const VAULT_ADDED_TO_REGISTRY = BigInt.fromI32(32165926); // https://ftmscan.com/tx/0xd043149c6a092e9684cea13d153dff9661b62d2476c198e46cb5f73a3c557afc

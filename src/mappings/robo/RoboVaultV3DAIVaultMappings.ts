@@ -17,25 +17,25 @@ import {
   getOrCreateTransactionFromEvent,
 } from '../../utils/transaction';
 import {
-    StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
-    StrategyMigrated,
-    StrategyReported1 as StrategyReportedEvent,
-    Deposit1Call as DepositCall,
-    Transfer as TransferEvent,
-    Withdraw1Call as WithdrawCall,
-    Deposit2Call,
-    Deposit1Call,
-    Withdraw1Call,
-    Withdraw2Call,
-    Withdraw3Call,
-    UpdatePerformanceFee as UpdatePerformanceFeeEvent,
-    UpdateManagementFee as UpdateManagementFeeEvent,
-    StrategyAdded1 as StrategyAddedV2Event,
-    StrategyAddedToQueue as StrategyAddedToQueueEvent,
-    StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
-    UpdateRewards as UpdateRewardsEvent,
-  } from '../../../generated/RoboVaultV3DAI/Vault';
-  
+  StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
+  StrategyMigrated,
+  StrategyReported1 as StrategyReportedEvent,
+  Deposit1Call as DepositCall,
+  Transfer as TransferEvent,
+  Withdraw1Call as WithdrawCall,
+  Deposit2Call,
+  Deposit1Call,
+  Withdraw1Call,
+  Withdraw2Call,
+  Withdraw3Call,
+  UpdatePerformanceFee as UpdatePerformanceFeeEvent,
+  UpdateManagementFee as UpdateManagementFeeEvent,
+  StrategyAdded1 as StrategyAddedV2Event,
+  StrategyAddedToQueue as StrategyAddedToQueueEvent,
+  StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
+  UpdateRewards as UpdateRewardsEvent,
+} from '../../../generated/RoboVaultV3DAI/Vault';
+
 const VAULT_NAME = 'RoboVaultV3DAI';
 const VAULT_ADDED_TO_REGISTRY = BigInt.fromI32(99999999);
 
