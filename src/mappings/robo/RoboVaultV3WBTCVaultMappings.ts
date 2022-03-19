@@ -1,21 +1,7 @@
-import { Address, log, BigInt } from '@graphprotocol/graph-ts';
-import { Vault as VaultContract } from '../../../generated/Registry/Vault';
-import * as vaultLibrary from '../../utils/vault/vault';
-import { Strategy, Transaction, Vault } from '../../../generated/schema';
-import { isEventBlockNumberLt, printCallInfo } from '../../utils/commons';
-import {
-  BIGINT_ZERO,
-  ZERO_ADDRESS,
-  DON_T_CREATE_VAULT_TEMPLATE,
-  EXPERIMENTAL,
-  API_VERSION_0_4_2,
-  ROBO_VAULT_REGISTRY,
-} from '../../utils/constants';
-import * as strategyLibrary from '../../utils/strategy/strategy';
-import {
-  getOrCreateTransactionFromCall,
-  getOrCreateTransactionFromEvent,
-} from '../../utils/transaction';
+/**
+ * The generated code for this vault
+ * Ensure the import path has the correct vault name
+ */
 import {
   StrategyReported as StrategyReported_v0_3_0_v0_3_1_Event,
   StrategyMigrated,
@@ -36,8 +22,39 @@ import {
   UpdateRewards as UpdateRewardsEvent,
 } from '../../../generated/RoboVaultV3WBTC/Vault';
 
+/**
+ * This vault name should match import path above
+ */
 const VAULT_NAME = 'RoboVaultV3WBTC';
-const VAULT_ADDED_TO_REGISTRY = BigInt.fromI32(99999999);
+
+/**
+ * This mapping file will be superseded by the Registry depending on the block number below.
+ * All events after this block number will be indexed via the the generic mapping files instead (see vaultMapping.ts)
+ */
+const VAULT_ADDED_TO_REGISTRY = BigInt.fromI32(32166495); // https://ftmscan.com/tx/0xbb009892388b2a91472211a104a46caa41e940ea99d5010cb2163df672c45ec2
+
+/**
+ * All code above this point is vault specifc. Everything below this point is duplicate code.
+ * It is duplicated because each vault has their own types (see generated code above).
+ */
+import { Address, log, BigInt } from '@graphprotocol/graph-ts';
+import { Vault as VaultContract } from '../../../generated/Registry/Vault';
+import * as vaultLibrary from '../../utils/vault/vault';
+import { Strategy, Transaction, Vault } from '../../../generated/schema';
+import { isEventBlockNumberLt, printCallInfo } from '../../utils/commons';
+import {
+  BIGINT_ZERO,
+  ZERO_ADDRESS,
+  DON_T_CREATE_VAULT_TEMPLATE,
+  EXPERIMENTAL,
+  API_VERSION_0_4_2,
+  ROBO_VAULT_REGISTRY,
+} from '../../utils/constants';
+import * as strategyLibrary from '../../utils/strategy/strategy';
+import {
+  getOrCreateTransactionFromCall,
+  getOrCreateTransactionFromEvent,
+} from '../../utils/transaction';
 
 function createVaultIfNeeded(
   vaultAddress: Address,
