@@ -153,6 +153,9 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     event.params.debtPaid,
     event
   );
+  if (!strategyReport) {
+    return;
+  }
 
   log.info(
     '[Vault mappings] Updating price per share (strategy reported): {}',
@@ -162,7 +165,7 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
   let vaultContract = VaultContract.bind(vaultContractAddress);
   vaultLibrary.strategyReported(
     ethTransaction,
-    strategyReport!,
+    strategyReport,
     vaultContract,
     vaultContractAddress
   );
