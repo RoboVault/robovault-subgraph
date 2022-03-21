@@ -31,6 +31,8 @@ We may use specific prefixes to indicate a particular type of value.
 - total - indicates this is a cumulative value (e.g. totalSharesMinted, totalGrossReturns).
 - balance - indicates this is a spot balance (e.g. balanceTokensInvested, balanceTokensIdle)
 - delta - indicates this value is the difference between the prior state and the current state (e.g. deltaPricePerShare).
+- current - used exclusively in **_Update_** entities. Similar to _balance_, current indicates the state of a field or value at the time of the update. These values are populated in every update whether they changed or not.
+- new - used exclusively in **_Update_** entities. Fields with this prefix will only be populated if they have changed since the last Update. If there has been no change, the value will be null.
 
 Use plurals when referring to Tokens or Shares (e.g., totalShares, balanceTokens).
 
@@ -42,7 +44,13 @@ Example: `Vault` and `VaultUpdate` entities.
 
 Every time a transaction modifies the information in a vault, a new `VaultUpdate` row is created. Then the handler changes the `Vault.latestUpdate` field. Also, The Graph adds the new `VaultUpdate`row in the `Vault.historicalUpdates` field collection automatically by the reference `VaultUpdate.vault`.
 
-In this case, we only create the new `VaultUpdate` item, setting the `VaultUpdate.vault` reference. We also set all the values using the previous `VaultUpdate` instance (the `Vault.latestUpdate` reference) and update the new value changed in the current transaction. In other words, we copy the previous `update` and update only the value the transaction changed (example: deposit, withdraw, transfer, etc.).
+In this case, we only create the new `VaultUpdate` item, setting the `VaultUpdate.vault` reference. We also set all the values using the previous `VaultUpdate` instance (the `Vault.latestUpdate` reference) and update the new value changed in the current transaction.
+
+`VaultUpdate` entities contain three categories of data;
+
+1. Data representing the value of a Vault field at the time of the update; denoted with the _current_ modifier. (e.g. currentManagementFee)
+2. Data representing how the state of the Vault has been changed by the event (e.g. tokensDeposited, sharesBurnt)
+3. Metadata for the update (e.g. blockNumber, transaction, vault)
 
 ### Minimal Proxies
 
@@ -74,6 +82,8 @@ This stores all the tokens used by the vaults (including yvTokens). The ID is th
 
 It stores the fee amount in a given token.
 Each time a tracked token is transferred, it verifies whether the `to` address is a fee receiver for the given vault or not. If so, it sums the fee to the treasury or strategy fees.
+
+TokenFee entities make a distinction between fees that have been recognized by accounting logic, and fees that have not been recognized yet. The reason is because fee revenue has to be imported by a different mapping handler than vault revenue. When the handler for vault revenue (StrategyReported) fires, it needs a way to figure out how much revenue reported by the strategy is going to eaten by fees.
 
 More info is in the `src/utils/token-fees.ts` file.
 

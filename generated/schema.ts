@@ -6,7 +6,6 @@ import {
   Value,
   ValueKind,
   store,
-  Address,
   Bytes,
   BigInt,
   BigDecimal
@@ -235,10 +234,13 @@ export class TokenFee extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("treasuryFees", Value.fromBigInt(BigInt.zero()));
-    this.set("strategyFees", Value.fromBigInt(BigInt.zero()));
-    this.set("totalFees", Value.fromBigInt(BigInt.zero()));
+    this.set("vault", Value.fromString(""));
     this.set("token", Value.fromString(""));
+    this.set("totalTreasuryFees", Value.fromBigInt(BigInt.zero()));
+    this.set("totalStrategyFees", Value.fromBigInt(BigInt.zero()));
+    this.set("totalFees", Value.fromBigInt(BigInt.zero()));
+    this.set("unrecognizedTreasuryFees", Value.fromBigInt(BigInt.zero()));
+    this.set("unrecognizedStrategyFees", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -267,22 +269,40 @@ export class TokenFee extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get treasuryFees(): BigInt {
-    let value = this.get("treasuryFees");
+  get vault(): string {
+    let value = this.get("vault");
+    return value!.toString();
+  }
+
+  set vault(value: string) {
+    this.set("vault", Value.fromString(value));
+  }
+
+  get token(): string {
+    let value = this.get("token");
+    return value!.toString();
+  }
+
+  set token(value: string) {
+    this.set("token", Value.fromString(value));
+  }
+
+  get totalTreasuryFees(): BigInt {
+    let value = this.get("totalTreasuryFees");
     return value!.toBigInt();
   }
 
-  set treasuryFees(value: BigInt) {
-    this.set("treasuryFees", Value.fromBigInt(value));
+  set totalTreasuryFees(value: BigInt) {
+    this.set("totalTreasuryFees", Value.fromBigInt(value));
   }
 
-  get strategyFees(): BigInt {
-    let value = this.get("strategyFees");
+  get totalStrategyFees(): BigInt {
+    let value = this.get("totalStrategyFees");
     return value!.toBigInt();
   }
 
-  set strategyFees(value: BigInt) {
-    this.set("strategyFees", Value.fromBigInt(value));
+  set totalStrategyFees(value: BigInt) {
+    this.set("totalStrategyFees", Value.fromBigInt(value));
   }
 
   get totalFees(): BigInt {
@@ -294,13 +314,22 @@ export class TokenFee extends Entity {
     this.set("totalFees", Value.fromBigInt(value));
   }
 
-  get token(): string {
-    let value = this.get("token");
-    return value!.toString();
+  get unrecognizedTreasuryFees(): BigInt {
+    let value = this.get("unrecognizedTreasuryFees");
+    return value!.toBigInt();
   }
 
-  set token(value: string) {
-    this.set("token", Value.fromString(value));
+  set unrecognizedTreasuryFees(value: BigInt) {
+    this.set("unrecognizedTreasuryFees", Value.fromBigInt(value));
+  }
+
+  get unrecognizedStrategyFees(): BigInt {
+    let value = this.get("unrecognizedStrategyFees");
+    return value!.toBigInt();
+  }
+
+  set unrecognizedStrategyFees(value: BigInt) {
+    this.set("unrecognizedStrategyFees", Value.fromBigInt(value));
   }
 }
 
@@ -650,6 +679,23 @@ export class Vault extends Entity {
   set apiVersion(value: string) {
     this.set("apiVersion", Value.fromString(value));
   }
+
+  get healthCheck(): string | null {
+    let value = this.get("healthCheck");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set healthCheck(value: string | null) {
+    if (!value) {
+      this.unset("healthCheck");
+    } else {
+      this.set("healthCheck", Value.fromString(<string>value));
+    }
+  }
 }
 
 export class VaultUpdate extends Entity {
@@ -666,11 +712,10 @@ export class VaultUpdate extends Entity {
     this.set("sharesMinted", Value.fromBigInt(BigInt.zero()));
     this.set("sharesBurnt", Value.fromBigInt(BigInt.zero()));
     this.set("balancePosition", Value.fromBigInt(BigInt.zero()));
-    this.set("pricePerShare", Value.fromBigInt(BigInt.zero()));
     this.set("returnsGenerated", Value.fromBigInt(BigInt.zero()));
     this.set("totalFees", Value.fromBigInt(BigInt.zero()));
-    this.set("managementFees", Value.fromBigInt(BigInt.zero()));
-    this.set("performanceFees", Value.fromBigInt(BigInt.zero()));
+    this.set("pricePerShare", Value.fromBigInt(BigInt.zero()));
+    this.set("currentBalanceTokens", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -780,15 +825,6 @@ export class VaultUpdate extends Entity {
     this.set("balancePosition", Value.fromBigInt(value));
   }
 
-  get pricePerShare(): BigInt {
-    let value = this.get("pricePerShare");
-    return value!.toBigInt();
-  }
-
-  set pricePerShare(value: BigInt) {
-    this.set("pricePerShare", Value.fromBigInt(value));
-  }
-
   get returnsGenerated(): BigInt {
     let value = this.get("returnsGenerated");
     return value!.toBigInt();
@@ -807,26 +843,60 @@ export class VaultUpdate extends Entity {
     this.set("totalFees", Value.fromBigInt(value));
   }
 
-  get managementFees(): BigInt {
-    let value = this.get("managementFees");
+  get pricePerShare(): BigInt {
+    let value = this.get("pricePerShare");
     return value!.toBigInt();
   }
 
-  set managementFees(value: BigInt) {
-    this.set("managementFees", Value.fromBigInt(value));
+  set pricePerShare(value: BigInt) {
+    this.set("pricePerShare", Value.fromBigInt(value));
   }
 
-  get performanceFees(): BigInt {
-    let value = this.get("performanceFees");
+  get currentBalanceTokens(): BigInt {
+    let value = this.get("currentBalanceTokens");
     return value!.toBigInt();
   }
 
-  set performanceFees(value: BigInt) {
-    this.set("performanceFees", Value.fromBigInt(value));
+  set currentBalanceTokens(value: BigInt) {
+    this.set("currentBalanceTokens", Value.fromBigInt(value));
   }
 
-  get rewards(): Bytes | null {
-    let value = this.get("rewards");
+  get newManagementFee(): BigInt | null {
+    let value = this.get("newManagementFee");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set newManagementFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("newManagementFee");
+    } else {
+      this.set("newManagementFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get newPerformanceFee(): BigInt | null {
+    let value = this.get("newPerformanceFee");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set newPerformanceFee(value: BigInt | null) {
+    if (!value) {
+      this.unset("newPerformanceFee");
+    } else {
+      this.set("newPerformanceFee", Value.fromBigInt(<BigInt>value));
+    }
+  }
+
+  get newRewards(): Bytes | null {
+    let value = this.get("newRewards");
     if (!value || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -834,12 +904,71 @@ export class VaultUpdate extends Entity {
     }
   }
 
-  set rewards(value: Bytes | null) {
+  set newRewards(value: Bytes | null) {
     if (!value) {
-      this.unset("rewards");
+      this.unset("newRewards");
     } else {
-      this.set("rewards", Value.fromBytes(<Bytes>value));
+      this.set("newRewards", Value.fromBytes(<Bytes>value));
     }
+  }
+
+  get newHealthCheck(): string | null {
+    let value = this.get("newHealthCheck");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set newHealthCheck(value: string | null) {
+    if (!value) {
+      this.unset("newHealthCheck");
+    } else {
+      this.set("newHealthCheck", Value.fromString(<string>value));
+    }
+  }
+}
+
+export class HealthCheck extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save HealthCheck entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save HealthCheck entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("HealthCheck", id.toString(), this);
+    }
+  }
+
+  static load(id: string): HealthCheck | null {
+    return changetype<HealthCheck | null>(store.get("HealthCheck", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get vaults(): Array<string> {
+    let value = this.get("vaults");
+    return value!.toStringArray();
+  }
+
+  set vaults(value: Array<string>) {
+    this.set("vaults", Value.fromStringArray(value));
   }
 }
 
@@ -1897,6 +2026,92 @@ export class Strategy extends Entity {
 
   set harvests(value: Array<string>) {
     this.set("harvests", Value.fromStringArray(value));
+  }
+}
+
+export class StrategyMigration extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("oldStrategy", Value.fromString(""));
+    this.set("newStrategy", Value.fromString(""));
+    this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("timestamp", Value.fromBigInt(BigInt.zero()));
+    this.set("transaction", Value.fromString(""));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save StrategyMigration entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save StrategyMigration entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("StrategyMigration", id.toString(), this);
+    }
+  }
+
+  static load(id: string): StrategyMigration | null {
+    return changetype<StrategyMigration | null>(
+      store.get("StrategyMigration", id)
+    );
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get oldStrategy(): string {
+    let value = this.get("oldStrategy");
+    return value!.toString();
+  }
+
+  set oldStrategy(value: string) {
+    this.set("oldStrategy", Value.fromString(value));
+  }
+
+  get newStrategy(): string {
+    let value = this.get("newStrategy");
+    return value!.toString();
+  }
+
+  set newStrategy(value: string) {
+    this.set("newStrategy", Value.fromString(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value!.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get timestamp(): BigInt {
+    let value = this.get("timestamp");
+    return value!.toBigInt();
+  }
+
+  set timestamp(value: BigInt) {
+    this.set("timestamp", Value.fromBigInt(value));
+  }
+
+  get transaction(): string {
+    let value = this.get("transaction");
+    return value!.toString();
+  }
+
+  set transaction(value: string) {
+    this.set("transaction", Value.fromString(value));
   }
 }
 

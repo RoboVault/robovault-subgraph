@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "tests/fixtureGenerator/out",
+    "sourceMap": true
+  },
+  "include": ["tests/fixtureGenerator/*"]
+}

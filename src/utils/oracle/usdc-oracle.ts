@@ -13,12 +13,16 @@ import {
   FTM_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
   FTM_MAINNET_USDC_ORACLE_ADDRESS,
   FTM_MAINNET_CALCULATIONS_SPOOKY_SWAP_ADDRESS,
+  ARB_MAINNET_NETWORK,
+  ARB_MAINNET_USDC_ORACLE_ADDRESS,
+  ARB_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS,
 } from '../constants';
 
 function getSushiSwapCalculationsAddress(network: string): Address {
   let map = new Map<string, string>();
   map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
   map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
+  map.set(ARB_MAINNET_NETWORK, ARB_MAINNET_CALCULATIONS_SUSHI_SWAP_ADDRESS);
   let address = changetype<Address>(Address.fromHexString(map.get(network)));
   log.info('Getting SushiSwap Calculations address {} in {}.', [
     address.toHexString(),
@@ -28,9 +32,11 @@ function getSushiSwapCalculationsAddress(network: string): Address {
 }
 
 function getOracleCalculatorAddress(network: string): Address {
+  log.debug('[Oracle] Loading price oracle for network: {}', [network]);
   let map = new Map<string, string>();
   map.set(ETH_MAINNET_NETWORK, ETH_MAINNET_USDC_ORACLE_ADDRESS);
   map.set(FTM_MAINNET_NETWORK, FTM_MAINNET_USDC_ORACLE_ADDRESS);
+  map.set(ARB_MAINNET_NETWORK, ARB_MAINNET_USDC_ORACLE_ADDRESS);
   let address = changetype<Address>(Address.fromHexString(map.get(network)));
   log.info('Getting Oracle Calculations address {} in {}.', [
     address.toHexString(),
@@ -103,14 +109,30 @@ export function usdcPrice(token: Token, tokenAmount: BigInt): BigInt {
 }
 
 export function usdcPricePerToken(tokenAddress: Address): BigInt {
+  log.debug('[Oracle] Obtaining price for token {}', [
+    tokenAddress.toHexString(),
+  ]);
   let oracle = getOracleCalculator();
+  log.debug('[Oracle] Oracle calculator load attempted', []);
   if (oracle !== null) {
     let result = oracle.try_getPriceUsdcRecommended(tokenAddress);
-    if (result.reverted === false) {
+    if (result.reverted) {
+      log.info('[Oracle] Oracle reverted while obtaining price info for {}', [
+        tokenAddress.toHexString(),
+      ]);
+    } else {
+      log.debug('[Oracle] {} token price is {}', [
+        tokenAddress.toHexString(),
+        result.value.toString(),
+      ]);
       return result.value;
     }
+  } else {
+    log.debug(
+      '[Oracle] Unable to load oracle for the currently deployed network',
+      []
+    );
   }
-
   return BIGINT_ZERO;
 }
 

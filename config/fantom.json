@@ -1,26 +1,87 @@
 {
   "startBlock": "18302800",
-  "startBlockRegistryV2": "18302800",
-  "startBlockCurveSETHVault": "18302800",
-  "startBlockYvWBTCVault": "18302800",
-  "startBlockYvLinkVault": "18302800",
   "network": "fantom",
-  "Registry": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
-  "RegistryV2": "0x0000000000000000000000000000000000000000",
-  "CurveSETHVault": "0x0000000000000000000000000000000000000000",
-  "yvWBTCVault": "0x0000000000000000000000000000000000000000",
-  "yvLinkVault": "0x0000000000000000000000000000000000000000",
+  "callHandlersEnabled": true,
 
-  "ftmYvWFTMVaultAddress": "0x0dec85e74a92c52b7f708c4b10207d9560cefaf0",
-  "ftmYvMIMVaultAddress": "0x0a0b23d9786963de69cb2447dc125c49929419d8",
-  "ftmYvUSDCVaultAddress": "0xef0210eb96c7eb36af8ed1c20306462764935607",
-  "ftmYvDAIVaultAddress": "0x637ec617c86d24e421328e6caea1d92114892439",
-  "ftmYvYFIVaultAddress": "0x2C850cceD00ce2b14AA9D658b7Cad5dF659493Db",
-  "ftmYv2CRVVaultAddress": "0xA6A0cA45c2ceF0c5C0E0B58A8Ddd59209378B76A",
-  "ftmYvWFTMVaultStartBlock": "16476356",
-  "ftmYvMIMVaultStartBlock": "18309707",
-  "ftmYvUSDCVaultStartBlock": "18387308",
-  "ftmYvDAIVaultStartBlock": "16158918",
-  "ftmYvYFIVaultStartBlock": "16844703",
-  "ftmYv2CRVVaultStartBlock": "16861262"
+  "Registry": "0x727fe1759430df13655ddb0731dE0D0FDE929b04",
+  "registryV2Enabled": false,
+  "registryV2Address": "0x0000000000000000000000000000000000000000",
+  "registryV2StartBlock": "2147483647",
+
+  "manualVaults": [
+    {
+      "name": "ftmYvWFTMVault",
+      "address": "0x0dec85e74a92c52b7f708c4b10207d9560cefaf0",
+      "startBlock": "16476356",
+      "mappingFile": "./src/mappings/ftm/yvFTMVaultMappings.ts",
+      "comments": [
+        "Custom FTM yvWFTMVault From: 16476356 to 18456258",
+        "yvWFTMVault Vault: https://ftmscan.com/address/0x0dec85e74a92c52b7f708c4b10207d9560cefaf0",
+        "Vault created at: #16476356 https://ftmscan.com/tx/0x8f4070fc63f6b2ed47e7ff44abe1288fa15209cc3fea24b35d6d8c14683f86ec",
+        "Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115"
+      ]
+    },
+    {
+      "name": "ftmYvMIMVault",
+      "address": "0x0a0b23d9786963de69cb2447dc125c49929419d8",
+      "startBlock": "18309707",
+      "mappingFile": "./src/mappings/ftm/yvMIMVaultMappings.ts",
+      "comments": [
+        "Custom FTM yvMIMVault From: 18309707 to 18456258",
+        "yvMIMVault Vault: https://ftmscan.com/address/0x0a0b23d9786963de69cb2447dc125c49929419d8",
+        "Vault created at: #18309707 https://ftmscan.com/tx/0xf610aadea5b7304f569e4727d5ade90577ba92ae3129af431f14c83a00137458",
+        "Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115"
+      ]
+    },
+    {
+      "name": "ftmYvUSDCVault",
+      "address": "0xef0210eb96c7eb36af8ed1c20306462764935607",
+      "startBlock": "18387308",
+      "mappingFile": "./src/mappings/ftm/yvUSDCVaultMappings.ts",
+      "comments": [
+        "Custom FTM yvUSDCVault From: 18387308 to 18456258",
+        "yvUSDCVault Vault: https://ftmscan.com/address/0xef0210eb96c7eb36af8ed1c20306462764935607",
+        "Vault created at: #18387308 https://ftmscan.com/tx/0xedc29d6a05b612c1b25dc15ad88cc12855e32f389afb69d6de5f1d9e9c34785a",
+        "Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115"
+      ]
+    },
+    {
+      "name": "ftmYvDAIVault",
+      "address": "0x637ec617c86d24e421328e6caea1d92114892439",
+      "startBlock": "16158918",
+      "mappingFile": "./src/mappings/ftm/yvDAIVaultMappings.ts",
+      "comments": [
+        "Custom FTM yvDAIVault From: 16158918 to 18456258",
+        "yvDAIVault Vault: https://ftmscan.com/address/0x637ec617c86d24e421328e6caea1d92114892439",
+        "Vault created at: #16158918 https://ftmscan.com/tx/0xd85f99dc584d65956a5d215921e7959fad11ba8a784c90840dbf2b5cc025e627",
+        "Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115"
+      ]
+    },
+    {
+      "name": "ftmYvYFIVault",
+      "address": "0x2C850cceD00ce2b14AA9D658b7Cad5dF659493Db",
+      "startBlock": "16844703",
+      "mappingFile": "./src/mappings/ftm/yvYFIVaultMappings.ts",
+      "comments": [
+        "Custom FTM yvYFIVault From: 16844703 to 99999999",
+        "yvYFIVault Vault: https://ftmscan.com/address/0x2C850cceD00ce2b14AA9D658b7Cad5dF659493Db",
+        "Vault created at: #16844703 https://ftmscan.com/tx/0x7f4897b1c1284fd719f67bb04120622a0a45ef14536513c49820e2978a468d43",
+        "Vaults added at (registry): #99999999 https://ftmscan.com/tx/"
+      ]
+    },
+    {
+      "name": "ftmYv2CRVVault",
+      "address": "0xA6A0cA45c2ceF0c5C0E0B58A8Ddd59209378B76A",
+      "startBlock": "16861262",
+      "mappingFile": "./src/mappings/ftm/yv2CRVVaultMappings.ts",
+      "comments": [
+        "Custom FTM yv2CRVVault From: 16861262 to 99999999",
+        "yv2CRVVault Vault: https://ftmscan.com/address/0xA6A0cA45c2ceF0c5C0E0B58A8Ddd59209378B76A",
+        "Vault created at: #16861262 https://ftmscan.com/tx/0xbf902241fba440a3c2bfa7700c5e388496eb304d672c0b3362780e0aa16e0ff6",
+        "Vaults added at (registry): #99999999 https://ftmscan.com/tx/"
+      ]
+    }
+  ],
+
+  "vaultsWithPreregisteredStrategies": []
 }

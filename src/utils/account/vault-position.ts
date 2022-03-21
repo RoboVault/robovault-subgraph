@@ -62,7 +62,7 @@ export function getBalancePosition(
   account: Account,
   vaultContract: VaultContract
 ): BigInt {
-  log.info('GetBalancePosition account  {} ', [account.id]);
+  log.info('[VaultPosition] GetBalancePosition account  {} ', [account.id]);
   let pricePerShare = vaultContract.pricePerShare();
   let decimals = vaultContract.decimals();
   // (vault.balanceOf(account) * (vault.pricePerShare() / 10**vault.decimals()))

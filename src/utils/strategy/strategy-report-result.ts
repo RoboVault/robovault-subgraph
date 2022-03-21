@@ -47,10 +47,10 @@ export function create(
     ]
   );
 
-  if (!currentReport.totalDebt.isZero() && !msInDays.equals(BIGDECIMAL_ZERO)) {
+  if (!previousReport.totalDebt.isZero() && !msInDays.equals(BIGDECIMAL_ZERO)) {
     let profitOverTotalDebt = profit
       .toBigDecimal()
-      .div(currentReport.totalDebt.toBigDecimal());
+      .div(previousReport.totalDebt.toBigDecimal());
     strategyReportResult.durationPr = profitOverTotalDebt;
     let yearOverDuration = DAYS_PER_YEAR.div(msInDays);
     let apr = profitOverTotalDebt.times(yearOverDuration);

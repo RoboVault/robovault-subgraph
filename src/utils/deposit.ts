@@ -49,6 +49,7 @@ export function getOrCreate(
     deposit.sharesMinted = sharesMinted;
     deposit.transaction = transaction.id;
 
+    // note: the vault update entity is created later
     let vaultUpdateId = vaultUpdateLibrary.buildIdFromVaultTxHashAndIndex(
       vault.id,
       transaction.id,

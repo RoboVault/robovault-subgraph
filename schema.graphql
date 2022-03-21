@@ -4,6 +4,8 @@
 #   * total - indicates this is a cumulative value (e.g. totalSharesMinted, totalGrossReturns)
 #   * balance - indicates this is a spot balance (e.g. balanceTokensInvested, balanceTokensIdle)
 #   * delta - indicates this value is the difference between the prior state and the current state (e.g. deltaPricePerShare)
+#   * current - used exclusively in Update entities. Similar to balance, current indicates the state of a field or value at the time of the update. These values are populated in every update whether they changed or not.
+#   * new - used exclusively in Update entities. Fields with this prefix will only be populated if they have changed since the last Update. If there has been no change, the value will be null.
 # Use plurals when referring to Tokens or Shares (e.g. totalShares, balanceTokens)
 
 type Transaction @entity {
@@ -49,18 +51,26 @@ type Token @entity {
 type TokenFee @entity {
   "Token address"
   id: ID!
-  "Fees paid using this token to the treasury"
-  treasuryFees: BigInt!
-  "Fees paid using this token to strategies"
-  strategyFees: BigInt!
-  "Fees paid using this token to strategies and the treasury"
-  totalFees: BigInt!
+  vault: Vault!
+  "The token which the fees are denominated in. Equivalent to vault.token."
   token: Token!
+  "All time fees paid using this token to the treasury. Denominated in the vault's want token."
+  totalTreasuryFees: BigInt!
+  "All time fees paid using this token to strategists.  Denominated in the vault's want token."
+  totalStrategyFees: BigInt!
+  "All time fees paid using this token to strategists and the treasury.  Denominated in the vault's want token."
+  totalFees: BigInt!
+
+  "Internal field used by VaultUpdate. The amount of treasury fees paid using this token that has yet to be recognized by the subgraph's accounting logic."
+  unrecognizedTreasuryFees: BigInt!
+  "Internal field used by VaultUpdate. The amount of strategist fees paid using this token that has yet to be recognized by the subgraph's accounting logic."
+  unrecognizedStrategyFees: BigInt!
 }
 
 enum VaultClassification {
   Endorsed
   Experimental
+  Released
 }
 
 ## TODO: Implement tracking the release pipeline from the Registry contract. Add these entities:
@@ -159,6 +169,8 @@ type Vault @entity {
   activation: BigInt!
   "The API version."
   apiVersion: String!
+  "The vault's health check contract."
+  healthCheck: HealthCheck
 }
 
 type VaultUpdate @entity {
@@ -173,6 +185,7 @@ type VaultUpdate @entity {
   "Vault this update is for"
   vault: Vault!
 
+
   ### BALANCES AND SHARES
 
   "Sum of tokens deposited"
@@ -186,21 +199,38 @@ type VaultUpdate @entity {
   "The current balance position defined as: (vault.totalAssets() * (vault.pricePerShare() / 10**vault.decimals()))."
   balancePosition: BigInt!
 
-  ### PERFORMANCE
 
-  "Current price per full share"
-  pricePerShare: BigInt!
+  ### PERFORMANCE
 
   "Returns generated in Tokens"
   returnsGenerated: BigInt!
-  "Total fees in Shares" # in this VaultUpdate
+  "Total fees accrued over the lifetime of the vault. Denominated in want tokens."
   totalFees: BigInt!
-  "Management fees in Shares"
-  managementFees: BigInt!
-  "Performance fees in Shares"
-  performanceFees: BigInt!
-  "The address where management fees are paid to"
-  rewards: Bytes
+
+  ### VAULT STATE
+
+  "Price per full share at the time of the update. Denominated in want tokens."
+  pricePerShare: BigInt!
+  "Balance of Tokens in the Vault and its Strategies at the time of update. "
+  currentBalanceTokens: BigInt!
+
+  ### TRANSIENT VALUES
+
+  "Management fee at time of update, in basis points. If this value has not been changed since the last VaultEvent, it will be null."
+  newManagementFee: BigInt
+  "New Performance fee at time of update, in basis points. If this value has not been changed since the last VaultEvent, it will be null."
+  newPerformanceFee: BigInt
+  "The new Rewards address that management fees will be paid to. If this value has not been changed since the last VaultEvent, it will be null."
+  newRewards: Bytes
+  "The vault's new health check contract. If this value has not been changed since the last VaultEvent, it will be null."
+  newHealthCheck: HealthCheck
+}
+
+type HealthCheck @entity {
+  "Health Check Address"
+  id: ID!
+  "Vaults that use this health check contract."
+  vaults: [Vault!]! @derivedFrom(field: "healthCheck")
 }
 
 type Account @entity {
@@ -385,7 +415,7 @@ type Strategy @entity {
   healthCheck: Bytes
   "Defines whether the strategy will call the health check or not."
   doHealthCheck: Boolean!
-  "Defines whether this strategy is within the vault queue."
+  "Defines whether this strategy is within the vault queue"
   inQueue: Boolean!
   "The Vault"
   vault: Vault!
@@ -407,6 +437,21 @@ type Strategy @entity {
   reports: [StrategyReport!]! @derivedFrom(field: "strategy")
   "harvest() calls"
   harvests: [Harvest!]! @derivedFrom(field: "strategy")
+}
+
+type StrategyMigration @entity {
+  "The Strategy Migration ID."
+  id: ID!
+  "Old Strategy"
+  oldStrategy: Strategy!
+  "New Strategy"
+  newStrategy: Strategy!
+  "Blocknumber the migration was created."
+  blockNumber: BigInt!
+  "Timestamp the migration was created."
+  timestamp: BigInt!
+  "Ethereum Transaction"
+  transaction: Transaction!
 }
 
 type StrategyReport @entity {
@@ -509,11 +554,11 @@ type VaultDayData @entity {
   withdrawn: BigInt!
   "The total earnings generated for this vault up to and including this day"
   totalReturnsGenerated: BigInt!
-  "The total earnings generated in USDC for this vault up to and including this day"
+  "The total earnings generated in USDC for this vault up to and including this day. These returns are priced using the token's USDC-denominated price at the time each harvest was performed."
   totalReturnsGeneratedUSDC: BigInt!
   "The earnings generated for this vault this day"
   dayReturnsGenerated: BigInt!
-  "The earnings generated in USDC for this vault this day"
+  "The earnings generated in USDC for this vault this day. These returns are priced using the token's USDC-denominated price at the time each harvest was performed."
   dayReturnsGeneratedUSDC: BigInt!
   "The price of one of the vault's underlying token"
   tokenPriceUSDC: BigInt!

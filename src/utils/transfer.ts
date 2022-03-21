@@ -31,7 +31,11 @@ export function getOrCreate(
   shareAmount: BigInt,
   transaction: Transaction
 ): Transfer {
-  log.debug('[Transfer] Get or create', []);
+  log.debug('[Transfer] Get or create. from: {} to: {} txnId: {}', [
+    fromAccount.id,
+    toAccount.id,
+    transaction.id,
+  ]);
   let id = buildIdFromAccountToAccountAndTransaction(
     fromAccount,
     toAccount,
@@ -39,19 +43,16 @@ export function getOrCreate(
   );
 
   let tokenAmountUsdc = usdcPrice(token, amount);
-
-  let toAddress = Address.fromString(toAccount.id);
-  let isFeeToTreasury = toAddress.equals(vault.rewards);
-  if (isFeeToTreasury) {
-    tokenFeeLibrary.addTreasuryFee(token.id, amount);
-  }
-
-  let isFeeToStrategy = false;
-  let strategy = Strategy.load(toAccount.id);
-  if (strategy !== null) {
-    isFeeToStrategy = true;
-    tokenFeeLibrary.addStrategyFee(token.id, amount);
-  }
+  let isFeeToStrategy = tokenFeeLibrary.isFeeToStrategy(
+    vault,
+    toAccount,
+    amount
+  );
+  let isFeeToTreasury = tokenFeeLibrary.isFeeToTreasury(
+    vault,
+    toAccount,
+    amount
+  );
 
   let transfer = Transfer.load(id);
   if (transfer === null) {

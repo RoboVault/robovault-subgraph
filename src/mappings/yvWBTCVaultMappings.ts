@@ -12,12 +12,12 @@ import {
   Withdraw1Call,
   Withdraw2Call,
   Withdraw3Call,
-  AddStrategyCall as AddStrategyV1Call,
-  AddStrategy1Call as AddStrategyV2Call,
   UpdatePerformanceFee as UpdatePerformanceFeeEvent,
   UpdateManagementFee as UpdateManagementFeeEvent,
   StrategyAddedToQueue as StrategyAddedToQueueEvent,
   StrategyRemovedFromQueue as StrategyRemovedFromQueueEvent,
+  StrategyAdded as StrategyAddedV1Event,
+  StrategyAdded1 as StrategyAddedV2Event,
   UpdateRewards as UpdateRewardsEvent,
 } from '../../generated/YvWBTCVault/Vault';
 import { Strategy, Transaction, Vault } from '../../generated/schema';
@@ -53,80 +53,58 @@ function createYvWBTCVaultIfNeeded(
   );
 }
 
-export function handleAddStrategyV2(call: AddStrategyV2Call): void {
-  if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
-    log.warning(
-      'yvWBTCVault_AddStrategyV2(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
-      [
-        call.transaction.hash.toHexString(),
-        call.to.toHexString(),
-        call.from.toHexString(),
-      ]
-    );
-    return;
-  }
+/* This version of the AddStrategy event is used in vaults 0.3.2 and up */
+export function handleStrategyAddedV2(event: StrategyAddedV2Event): void {
   if (
     isEventBlockNumberLt(
-      'yvWBTCVault_AddStrategyV2Call',
-      call.block,
+      'yvWBTCVault_AddStrategyV2Event',
+      event.block,
       YV_WBTC_VAULT_END_BLOCK_CUSTOM
     )
   ) {
-    let ethTransaction = getOrCreateTransactionFromCall(
-      call,
-      'yvWBTCVault_AddStrategyV2Call'
+    let transaction = getOrCreateTransactionFromEvent(
+      event,
+      'yvWBTCVault_AddStrategyV2Event'
     );
-
     strategyLibrary.createAndGet(
-      ethTransaction.id,
-      call.inputs.strategy,
-      call.to,
-      call.inputs.debtRatio,
+      transaction.id,
+      event.params.strategy,
+      event.address,
+      event.params.debtRatio,
       BIGINT_ZERO,
-      call.inputs.minDebtPerHarvest,
-      call.inputs.maxDebtPerHarvest,
-      call.inputs.performanceFee,
+      event.params.minDebtPerHarvest,
+      event.params.maxDebtPerHarvest,
+      event.params.performanceFee,
       null,
-      ethTransaction
+      transaction
     );
   }
 }
 
-export function handleAddStrategy(call: AddStrategyV1Call): void {
-  if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
-    log.warning(
-      'yvWBTCVault_AddStrategy(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
-      [
-        call.transaction.hash.toHexString(),
-        call.to.toHexString(),
-        call.from.toHexString(),
-      ]
-    );
-    return;
-  }
+/* This version of the AddStrategy event was used in vaults from 0.1.0 up to and including 0.3.1 */
+export function handleStrategyAddedV1(event: StrategyAddedV1Event): void {
   if (
     isEventBlockNumberLt(
-      'yvWBTCVault_AddStrategyCall',
-      call.block,
+      'yvWBTCVault_AddStrategyV1Event',
+      event.block,
       YV_WBTC_VAULT_END_BLOCK_CUSTOM
     )
   ) {
-    let ethTransaction = getOrCreateTransactionFromCall(
-      call,
-      'yvWBTCVault_AddStrategyCall'
+    let transaction = getOrCreateTransactionFromEvent(
+      event,
+      'yvWBTCVault_AddStrategyV1Event'
     );
-
     strategyLibrary.createAndGet(
-      ethTransaction.id,
-      call.inputs._strategy,
-      call.to,
-      call.inputs._debtLimit,
-      call.inputs._rateLimit,
+      transaction.id,
+      event.params.strategy,
+      event.address,
+      event.params.debtLimit,
+      event.params.rateLimit,
       BIGINT_ZERO,
       BIGINT_ZERO,
-      call.inputs._performanceFee,
+      event.params.performanceFee,
       null,
-      ethTransaction
+      transaction
     );
   }
 }
@@ -151,7 +129,7 @@ export function handleStrategyReported_v0_3_0_v0_3_1(
       event,
       'yvWBTCVault_StrategyReportedEvent'
     );
-    strategyLibrary.createReport(
+    let strategyReport = strategyLibrary.createReport(
       ethTransaction,
       event.params.strategy.toHexString(),
       event.params.gain,
@@ -173,9 +151,9 @@ export function handleStrategyReported_v0_3_0_v0_3_1(
     let vaultContract = VaultContract.bind(vaultContractAddress);
     vaultLibrary.strategyReported(
       ethTransaction,
+      strategyReport!,
       vaultContract,
-      vaultContractAddress,
-      vaultContract.pricePerShare()
+      vaultContractAddress
     );
   }
 }
@@ -203,7 +181,7 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
       'yvWBTCVault_StrategyReportedEvent'
     );
 
-    strategyLibrary.createReport(
+    let strategyReport = strategyLibrary.createReport(
       ethTransaction,
       event.params.strategy.toHexString(),
       event.params.gain,
@@ -225,9 +203,9 @@ export function handleStrategyReported(event: StrategyReportedEvent): void {
     let vaultContract = VaultContract.bind(vaultContractAddress);
     vaultLibrary.strategyReported(
       ethTransaction,
+      strategyReport!,
       vaultContract,
-      vaultContractAddress,
-      vaultContract.pricePerShare()
+      vaultContractAddress
     );
   }
 }

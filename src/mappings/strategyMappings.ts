@@ -4,6 +4,8 @@ import {
   Cloned as ClonedEvent,
   SetHealthCheckCall,
   SetDoHealthCheckCall,
+  SetHealthCheck as SetHealthCheckEvent,
+  SetDoHealthCheck as SetDoHealthCheckEvent,
 } from '../../generated/templates/Vault/Strategy';
 import * as strategyLibrary from '../utils/strategy/strategy';
 import {
@@ -31,6 +33,22 @@ export function handleSetHealthCheck(call: SetHealthCheckCall): void {
   );
 }
 
+export function handleSetHealthCheckEvent(event: SetHealthCheckEvent): void {
+  let strategyAddress = event.address;
+  let txHash = event.transaction.hash.toHexString();
+  let newHealthCheckAddress = event.params.healthCheckAddress;
+  log.info(
+    '[Strategy Mapping] Handle set health check via event {} in strategy {} and TX hash {}',
+    [newHealthCheckAddress.toHexString(), strategyAddress.toHexString(), txHash]
+  );
+  let transaction = getOrCreateTransactionFromEvent(event, 'SetHealthCheck');
+  strategyLibrary.healthCheckSet(
+    strategyAddress,
+    newHealthCheckAddress,
+    transaction
+  );
+}
+
 export function handleSetDoHealthCheck(call: SetDoHealthCheckCall): void {
   let strategyAddress = call.to;
   let txHash = call.transaction.hash.toHexString();
@@ -46,6 +64,24 @@ export function handleSetDoHealthCheck(call: SetDoHealthCheckCall): void {
   strategyLibrary.doHealthCheckSet(
     strategyAddress,
     call.inputs._doHealthCheck,
+    transaction
+  );
+}
+
+export function handleSetDoHealthCheckEvent(
+  event: SetDoHealthCheckEvent
+): void {
+  let strategyAddress = event.address;
+  let txHash = event.transaction.hash.toHexString();
+  let healthCheckEnabled = event.params.doHealthCheck;
+  log.info(
+    '[Strategy Mapping] Handle set do health check via event {} in strategy {} and TX hash {}',
+    [booleanToString(healthCheckEnabled), strategyAddress.toHexString(), txHash]
+  );
+  let transaction = getOrCreateTransactionFromEvent(event, 'SetDoHealthCheck');
+  strategyLibrary.doHealthCheckSet(
+    strategyAddress,
+    healthCheckEnabled,
     transaction
   );
 }

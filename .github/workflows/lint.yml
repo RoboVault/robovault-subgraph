@@ -1,6 +1,9 @@
 name: Lint
 
-on: [push]
+on: [push, pull_request]
+
+env:
+  NODE_VERSION: "12.x"
 
 jobs:
   files:
@@ -27,7 +30,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v1
         with:
-          node-version: "12.x"
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Install dependencies
         run: yarn --frozen-lockfile

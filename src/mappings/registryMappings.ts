@@ -1,4 +1,4 @@
-import { BigInt, dataSource, log } from '@graphprotocol/graph-ts';
+import { dataSource, log, Address } from '@graphprotocol/graph-ts';
 import {
   NewRelease as NewReleaseEvent,
   NewVault as NewVaultEvent,
@@ -12,6 +12,14 @@ import { DO_CREATE_VAULT_TEMPLATE } from '../utils/constants';
 
 export function handleNewRelease(event: NewReleaseEvent): void {
   let registryAddress = dataSource.address();
+  handleNewReleaseInner(registryAddress, event);
+}
+
+/** We use an inner function because we cannot mock dataSource yet. https://github.com/LimeChain/matchstick/issues/168 */
+export function handleNewReleaseInner(
+  registryAddress: Address,
+  event: NewReleaseEvent
+): void {
   log.info(
     '[Registry] NewRelease: Registry {} - ApiVersion {} - ReleaseID {} - Template {} - Sender {} TX {}',
     [
@@ -32,16 +40,25 @@ export function handleNewRelease(event: NewReleaseEvent): void {
     event.params.template,
     event.params.api_version,
     event.params.release_id,
-    event
+    event,
+    ethTransaction
   );
 }
 
 export function handleNewVault(event: NewVaultEvent): void {
   let registryAddress = dataSource.address();
+  handleNewVaultInner(registryAddress, event);
+}
+
+/** We use an inner function because we cannot mock dataSource yet. https://github.com/LimeChain/matchstick/issues/168 */
+export function handleNewVaultInner(
+  registryAddress: Address,
+  event: NewVaultEvent
+): void {
   log.info(
     '[Registry] NewVault: Registry {} - New vault {} - Sender {} - TX {}',
     [
-      dataSource.address().toHexString(),
+      registryAddress.toHexString(),
       event.params.vault.toHexString(),
       event.transaction.from.toHexString(),
       event.transaction.hash.toHexString(),

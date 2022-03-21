@@ -108,3 +108,10 @@ subgraph.yaml
 package-lock.json
 .idea
 analysis
+*.wasm
+out/
+tests/fixtureGenerator/config.json
+tests/.tools
+tests/.bin
+# matchstick-as
+.bin

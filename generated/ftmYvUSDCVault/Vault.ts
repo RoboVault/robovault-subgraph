@@ -62,6 +62,58 @@ export class Approval__Params {
   }
 }
 
+export class Deposit extends ethereum.Event {
+  get params(): Deposit__Params {
+    return new Deposit__Params(this);
+  }
+}
+
+export class Deposit__Params {
+  _event: Deposit;
+
+  constructor(event: Deposit) {
+    this._event = event;
+  }
+
+  get recipient(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get shares(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
+export class Withdraw extends ethereum.Event {
+  get params(): Withdraw__Params {
+    return new Withdraw__Params(this);
+  }
+}
+
+export class Withdraw__Params {
+  _event: Withdraw;
+
+  constructor(event: Withdraw) {
+    this._event = event;
+  }
+
+  get recipient(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get shares(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
 export class StrategyAdded extends ethereum.Event {
   get params(): StrategyAdded__Params {
     return new StrategyAdded__Params(this);

@@ -29,7 +29,7 @@ export function getOrCreateTransactionFromCall(
   );
   let transaction = _getOrCreateTransaction(
     call.transaction,
-    call.transaction.index, // As the call hasnt the event log inde, we use the transaction index value.
+    call.transaction.index, // As the call hasnt the event log inde, we use the transaction index value. Will this cause an accounting error if someone deposits and withdraws from a vault in the same transaction?
     call.block,
     action
   );

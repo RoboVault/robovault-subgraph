@@ -1,9 +1,9 @@
 import { log } from '@graphprotocol/graph-ts';
 import {
-  AddStrategy1Call as AddStrategyV2Call,
   Vault as VaultContract,
   UpdatePerformanceFee as UpdatePerformanceFeeEvent,
   UpdateManagementFee as UpdateManagementFeeEvent,
+  StrategyAdded1 as StrategyAddedV2Event,
 } from '../../generated/Registry/Vault';
 import { isEventBlockNumberLt } from '../utils/commons';
 import {
@@ -27,41 +27,30 @@ import * as vaultLibrary from '../utils/vault/vault';
 
   This custom handler, handle the new strategies in that block range. 
  */
-export function handleAddStrategyV2(call: AddStrategyV2Call): void {
-  if (vaultLibrary.isVault(call.to) && vaultLibrary.isVault(call.from)) {
-    log.warning(
-      'CurveSETHVault_AddStrategyV2(...) - TX {} - Call to {} and call from {} are vaults (minimal proxy). Not processing addStrategy tx.',
-      [
-        call.transaction.hash.toHexString(),
-        call.to.toHexString(),
-        call.from.toHexString(),
-      ]
-    );
-    return;
-  }
+/* This version of the AddStrategy event is used in vaults 0.3.2 and up */
+export function handleStrategyAddedV2(event: StrategyAddedV2Event): void {
   if (
     isEventBlockNumberLt(
-      'CurveSETHVault_AddStrategyV2',
-      call.block,
+      'CurveSETHVault_AddStrategyV2Event',
+      event.block,
       CURVE_SETH_VAULT_END_BLOCK_CUSTOM
     )
   ) {
-    let ethTransaction = getOrCreateTransactionFromCall(
-      call,
-      'CurveSETHVault_AddStrategyV2Call'
+    let transaction = getOrCreateTransactionFromEvent(
+      event,
+      'CurveSETHVault_AddStrategyV2Event'
     );
-
     strategyLibrary.createAndGet(
-      ethTransaction.id,
-      call.inputs.strategy,
-      call.to,
-      call.inputs.debtRatio,
+      transaction.id,
+      event.params.strategy,
+      event.address,
+      event.params.debtRatio,
       BIGINT_ZERO,
-      call.inputs.minDebtPerHarvest,
-      call.inputs.maxDebtPerHarvest,
-      call.inputs.performanceFee,
+      event.params.minDebtPerHarvest,
+      event.params.maxDebtPerHarvest,
+      event.params.performanceFee,
       null,
-      ethTransaction
+      transaction
     );
   }
 }

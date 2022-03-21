@@ -36,6 +36,24 @@ export class Transfer__Params {
   }
 }
 
+export class UpdateHealthCheck extends ethereum.Event {
+  get params(): UpdateHealthCheck__Params {
+    return new UpdateHealthCheck__Params(this);
+  }
+}
+
+export class UpdateHealthCheck__Params {
+  _event: UpdateHealthCheck;
+
+  constructor(event: UpdateHealthCheck) {
+    this._event = event;
+  }
+
+  get healthCheck(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
 export class Approval extends ethereum.Event {
   get params(): Approval__Params {
     return new Approval__Params(this);
@@ -58,6 +76,58 @@ export class Approval__Params {
   }
 
   get value(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
+export class Deposit extends ethereum.Event {
+  get params(): Deposit__Params {
+    return new Deposit__Params(this);
+  }
+}
+
+export class Deposit__Params {
+  _event: Deposit;
+
+  constructor(event: Deposit) {
+    this._event = event;
+  }
+
+  get recipient(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get shares(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get amount(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+}
+
+export class Withdraw extends ethereum.Event {
+  get params(): Withdraw__Params {
+    return new Withdraw__Params(this);
+  }
+}
+
+export class Withdraw__Params {
+  _event: Withdraw;
+
+  constructor(event: Withdraw) {
+    this._event = event;
+  }
+
+  get recipient(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+
+  get shares(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
+
+  get amount(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 }

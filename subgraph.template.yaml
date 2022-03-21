@@ -2,7 +2,7 @@ specVersion: 0.0.3
 schema:
   file: ./schema.graphql
 dataSources:
-  # 1 Registry
+  # 1. Registry
   - kind: ethereum/contract
     name: Registry
     network: {{network}}
@@ -36,13 +36,15 @@ dataSources:
         - event: VaultTagged(address,string)
           handler: handleVaultTagged
       file: ./src/mappings/registryMappings.ts
-  # 2 RegistryV2
+  
+  # 2. RegistryV2 (if applicable)
+  {{#registryV2Enabled}}
   - kind: ethereum/contract
     name: RegistryV2
     network: {{network}}
     source:
-      startBlock: {{startBlockRegistryV2}}
-      address: '{{RegistryV2}}'
+      startBlock: {{registryV2StartBlock}}
+      address: '{{registryV2Address}}'
       abi: Registry
     mapping:
       kind: ethereum/events
@@ -70,13 +72,19 @@ dataSources:
         - event: VaultTagged(address,string)
           handler: handleVaultTagged
       file: ./src/mappings/registryMappings.ts
-  # 3 Custom CurveSETHVault From: 11870013 to 11881933
+  {{/registryV2Enabled}}
+
+  # 3. Vaults that had strategies added before they were added to the registry (if applicable)
+  {{#vaultsWithPreregisteredStrategies}}
+  {{#comments}}
+  # {{{.}}}
+  {{/comments}}
   - kind: ethereum/contract
-    name: CurveSETHVault
+    name: {{name}}
     network: {{network}}
     source:
-      startBlock: {{startBlockCurveSETHVault}}
-      address: '{{CurveSETHVault}}'
+      startBlock: {{startBlock}}
+      address: '{{address}}'
       abi: Vault
     mapping:
       kind: ethereum/events
@@ -100,22 +108,23 @@ dataSources:
           handler: handleUpdatePerformanceFee
         - event: UpdateManagementFee(uint256)
           handler: handleUpdateManagementFee
-      callHandlers:
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/curveSETHVaultMappings.ts
+          # V2: StrategyAdded(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleStrategyAddedV2
+      file: {{{mappingFile}}}
+  {{/vaultsWithPreregisteredStrategies}}
 
-# 4 Custom yvWBTCVault From: 12185982 to 12341475
-# Vault created at: #12185982 https://etherscan.io/tx/0x3ccba99bae2b5ab77dc6ab4f429b28e78a381030e0175b22213f1e230a62a0af
-# Vault added at (registry): #12341475 https://etherscan.io/tx/0xb48353d6eb05fee387dff781ce113d65a78603b521e9a76cb3458024afd99eb7
-# Strategy added at (vault): #12213272  https://etherscan.io/tx/0x547a2394114a777c704b0e663d74ab773dca7e60ca090ce36852ee0dc95ba3d5 
+  # 4. Manually instantiated vaults. (if applicable)
+  {{#manualVaults}}
+  {{#comments}}
+  # {{{.}}}
+  {{/comments}}
   - kind: ethereum/contract
-    name: YvWBTCVault
+    name: {{name}}
     network: {{network}}
     source:
-      startBlock: {{startBlockYvWBTCVault}}
-      address: '{{yvWBTCVault}}'
+      startBlock: {{startBlock}}
+      address: '{{address}}'
       abi: Vault
     mapping:
       kind: ethereum/events
@@ -166,6 +175,17 @@ dataSources:
           handler: handleStrategyRemovedFromQueue
         - event: UpdateRewards(address)
           handler: handleUpdateRewards
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositEvent
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawEvent
+          # V1: StrategyAdded(strategy,debtLimit,rateLimit,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
+          handler: handleStrategyAddedV1
+          # V2: StrategyAdded(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleStrategyAddedV2
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -179,584 +199,9 @@ dataSources:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/yvWBTCVaultMappings.ts
-
-# 5 Custom yvLinkVault From: 12542636 to 12586056
-# yvLINK Vault: https://etherscan.io/address/0x671a912c10bba0cfa74cfc2d6fba9ba1ed9530b2
-# Vault created at: #12542636 https://etherscan.io/tx/0x78b4dc710fe0b0672e2069a945d5c5c9f39c51fcb7e23b3c19e0d26004e5b4b7
-# Vault added at (registry): #12586056 https://etherscan.io/tx/0xc3ef41ed2c75f69415d9ae8217bf4e209c1b0affec9186f8bfd77e60cc54595e
-# Strategy 'AaveLenderLINKBorrowerSUSD' added at (vault): #
-#   #12565254 https://etherscan.io/tx/0x6539347e53d68460e7c6f73d2b9bcc1b9d32e7ae8fce473c532f6eec2fde3700#eventlog
-# Strategy 'Vesper LINK' added at (vault): #
-#   #12561578 https://etherscan.io/tx/0x3e08e0b0319f62886052fd905d7f6d0d35ae84c44a2a55835e25d9d3ed4af962
-  - kind: ethereum/contract
-    name: YvLinkVault
-    network: {{network}}
-    source:
-      startBlock: {{startBlockYvLinkVault}}
-      address: '{{yvLinkVault}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/yvLinkVaultMappings.ts
-
-  # Custom FTM yvWFTMVault From: 16476356 to 18456258
-  # yvWFTMVault Vault: https://ftmscan.com/address/0x0dec85e74a92c52b7f708c4b10207d9560cefaf0
-  # Vault created at: #16476356 https://ftmscan.com/tx/0x8f4070fc63f6b2ed47e7ff44abe1288fa15209cc3fea24b35d6d8c14683f86ec
-  # Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115
-  - kind: ethereum/contract
-    name: ftmYvWFTMVault
-    network: {{network}}
-    source:
-      startBlock: {{ftmYvWFTMVaultStartBlock}}
-      address: '{{ftmYvWFTMVaultAddress}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/ftm/yvFTMVaultMappings.ts
-
-  # Custom FTM yvMIMVault From: 18309707 to 18456258
-  # yvMIMVault Vault: https://ftmscan.com/address/0x0a0b23d9786963de69cb2447dc125c49929419d8
-  # Vault created at: #18309707 https://ftmscan.com/tx/0xf610aadea5b7304f569e4727d5ade90577ba92ae3129af431f14c83a00137458
-  # Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115
-  - kind: ethereum/contract
-    name: ftmYvMIMVault
-    network: {{network}}
-    source:
-      startBlock: {{ftmYvMIMVaultStartBlock}}
-      address: '{{ftmYvMIMVaultAddress}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/ftm/yvMIMVaultMappings.ts
-
-  # Custom FTM yvDAIVault From: 16158918 to 18456258
-  # yvDAIVault Vault: https://ftmscan.com/address/0x637ec617c86d24e421328e6caea1d92114892439
-  # Vault created at: #16158918 https://ftmscan.com/tx/0xd85f99dc584d65956a5d215921e7959fad11ba8a784c90840dbf2b5cc025e627
-  # Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115
-  - kind: ethereum/contract
-    name: ftmYvDAIVault
-    network: {{network}}
-    source:
-      startBlock: {{ftmYvDAIVaultStartBlock}}
-      address: '{{ftmYvDAIVaultAddress}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/ftm/yvDAIVaultMappings.ts
-
-  # Custom FTM yvUSDCVault From: 18387308 to 18456258
-  # yvUSDCVault Vault: https://ftmscan.com/address/0xef0210eb96c7eb36af8ed1c20306462764935607
-  # Vault created at: #18387308 https://ftmscan.com/tx/0xedc29d6a05b612c1b25dc15ad88cc12855e32f389afb69d6de5f1d9e9c34785a
-  # Vaults added at (registry): #18456258 https://ftmscan.com/tx/0xe270df804fe8262f42827ed479f845553ef019501ddfea0d94f49c4d6750d115
-  - kind: ethereum/contract
-    name: ftmYvUSDCVault
-    network: {{network}}
-    source:
-      startBlock: {{ftmYvUSDCVaultStartBlock}}
-      address: '{{ftmYvUSDCVaultAddress}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/ftm/yvUSDCVaultMappings.ts
-
-  # Custom FTM yvYFIVault From: 16844703 to 99999999
-  # yvYFIVault Vault: https://ftmscan.com/address/0x2C850cceD00ce2b14AA9D658b7Cad5dF659493Db
-  # Vault created at: #16844703 https://ftmscan.com/tx/0x7f4897b1c1284fd719f67bb04120622a0a45ef14536513c49820e2978a468d43
-  # Vaults added at (registry): #99999999 https://ftmscan.com/tx/
-  - kind: ethereum/contract
-    name: ftmYvYFIVault
-    network: {{network}}
-    source:
-      startBlock: {{ftmYvYFIVaultStartBlock}}
-      address: '{{ftmYvYFIVaultAddress}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/ftm/yvYFIVaultMappings.ts
-
-  # Custom FTM yv2CRVVault From: 16861262 to 99999999
-  # yv2CRVVault Vault: https://ftmscan.com/address/0xA6A0cA45c2ceF0c5C0E0B58A8Ddd59209378B76A
-  # Vault created at: #16861262 https://ftmscan.com/tx/0xbf902241fba440a3c2bfa7700c5e388496eb304d672c0b3362780e0aa16e0ff6
-  # Vaults added at (registry): #99999999 https://ftmscan.com/tx/
-  - kind: ethereum/contract
-    name: ftmYv2CRVVault
-    network: {{network}}
-    source:
-      startBlock: {{ftmYv2CRVVaultStartBlock}}
-      address: '{{ftmYv2CRVVaultAddress}}'
-      abi: Vault
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.5
-      language: wasm/assemblyscript
-      entities:
-        - Vault
-        - Strategy
-        - VaultUpdate
-        - Transfer
-        - Account
-        - Deposit
-        - VaultUpdate
-        - Transfer
-        - Transaction
-        - Token
-        - AccountVaultPosition
-        - AccountVaultPositionUpdate
-      abis:
-        - name: Vault
-          file: ./abis/Vault.json
-        - name: ERC20
-          file: ./abis/ERC20Detailed.json
-        - name: Strategy
-          file: ./abis/StrategyAPI.json
-        - name: Oracle
-          file: ./abis/Oracle.json
-        - name: CalculationsCurve
-          file: ./abis/CalculationsCurve.json
-        - name: CalculationsSushiSwap
-          file: ./abis/CalculationsSushiSwap.json
-      eventHandlers:
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported_v0_3_0_v0_3_1
-        - event: StrategyReported(indexed address,uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256)
-          handler: handleStrategyReported
-        - event: StrategyMigrated(indexed address,indexed address)
-          handler: handleStrategyMigrated
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: UpdatePerformanceFee(uint256)
-          handler: handleUpdatePerformanceFee
-        - event: UpdateManagementFee(uint256)
-          handler: handleUpdateManagementFee
-        - event: StrategyAddedToQueue(indexed address)
-          handler: handleStrategyAddedToQueue
-        - event: StrategyRemovedFromQueue(indexed address)
-          handler: handleStrategyRemovedFromQueue
-        - event: UpdateRewards(address)
-          handler: handleUpdateRewards
-      callHandlers:
-        - function: deposit()
-          handler: handleDeposit
-        - function: deposit(uint256)
-          handler: handleDepositWithAmount
-        - function: deposit(uint256,address)
-          handler: handleDepositWithAmountAndRecipient
-        - function: withdraw()
-          handler: handleWithdraw
-        - function: withdraw(uint256)
-          handler: handleWithdrawWithShares
-        - function: withdraw(uint256,address)
-          handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-      file: ./src/mappings/ftm/yv2CRVVaultMappings.ts
+      {{/callHandlersEnabled}}
+      file: {{{mappingFile}}}
+  {{/manualVaults}}
 
 templates:
   # 1 Vault (template)
@@ -773,6 +218,7 @@ templates:
       entities:
         - Vault
         - Strategy
+        - StrategyMigration
         - VaultUpdate
         - Transfer
         - Account
@@ -815,6 +261,19 @@ templates:
           handler: handleStrategyRemovedFromQueue
         - event: UpdateRewards(address)
           handler: handleUpdateRewards
+        - event: Deposit(indexed address,uint256,uint256)
+          handler: handleDepositEvent
+        - event: Withdraw(indexed address,uint256,uint256)
+          handler: handleWithdrawEvent
+          # V1: StrategyAdded(strategy,debtLimit,rateLimit,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256)
+          handler: handleStrategyAddedV1
+          # V2: StrategyAdded(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
+        - event: StrategyAdded(indexed address,uint256,uint256,uint256,uint256)
+          handler: handleStrategyAddedV2
+        - event: UpdateHealthCheck(indexed address)
+          handler: handleUpdateHealthCheck
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: deposit()
           handler: handleDeposit
@@ -828,13 +287,7 @@ templates:
           handler: handleWithdrawWithShares
         - function: withdraw(uint256,address)
           handler: handleWithdrawWithSharesAndRecipient
-        # V1: addStrategy(strategy,debtRatio,rateLimit,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256)
-          handler: handleAddStrategy
-        # V2: addStrategy(strategy,debtRatio,minDebtPerHarvest,maxDebtPerHarvest,performanceFee)
-        - function: addStrategy(address,uint256,uint256,uint256,uint256)
-          handler: handleAddStrategyV2
-
+      {{/callHandlersEnabled}}
   - name: Strategy
     kind: ethereum/contract
     network: {{network}}
@@ -866,9 +319,14 @@ templates:
           handler: handleHarvested
         - event: Cloned(indexed address)
           handler: handleCloned
+        - event: SetHealthCheck(address)
+          handler: handleSetHealthCheckEvent
+        - event: SetDoHealthCheck(bool)
+          handler: handleSetDoHealthCheckEvent
+      {{#callHandlersEnabled}}
       callHandlers:
         - function: setHealthCheck(address)
           handler: handleSetHealthCheck
         - function: setDoHealthCheck(bool)
           handler: handleSetDoHealthCheck
-
+      {{/callHandlersEnabled}}

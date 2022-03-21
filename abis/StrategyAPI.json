@@ -11,6 +11,30 @@
       "name": "EmergencyExitEnabled",
       "type": "event"
     },
+    {
+      "anonymous": false,
+      "name": "SetHealthCheck",
+      "type": "event",
+      "inputs": [
+        {
+          "indexed": false,
+          "type": "address",
+          "name": "healthCheckAddress"
+        }
+      ]
+    },
+    {
+      "anonymous": false,
+      "name": "SetDoHealthCheck",
+      "type": "event",
+      "inputs": [
+        {
+          "indexed": false,
+          "type": "bool",
+          "name": "doHealthCheck"
+        }
+      ]
+    },
     { "anonymous": false, "inputs": [{ "indexed": true, "internalType": "address", "name": "clone", "type": "address" }], "name": "Cloned", "type": "event" },
     {
       "anonymous": false,

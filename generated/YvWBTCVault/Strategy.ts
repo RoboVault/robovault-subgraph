@@ -24,6 +24,42 @@ export class EmergencyExitEnabled__Params {
   }
 }
 
+export class SetHealthCheck extends ethereum.Event {
+  get params(): SetHealthCheck__Params {
+    return new SetHealthCheck__Params(this);
+  }
+}
+
+export class SetHealthCheck__Params {
+  _event: SetHealthCheck;
+
+  constructor(event: SetHealthCheck) {
+    this._event = event;
+  }
+
+  get healthCheckAddress(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class SetDoHealthCheck extends ethereum.Event {
+  get params(): SetDoHealthCheck__Params {
+    return new SetDoHealthCheck__Params(this);
+  }
+}
+
+export class SetDoHealthCheck__Params {
+  _event: SetDoHealthCheck;
+
+  constructor(event: SetDoHealthCheck) {
+    this._event = event;
+  }
+
+  get doHealthCheck(): boolean {
+    return this._event.parameters[0].value.toBoolean();
+  }
+}
+
 export class Cloned extends ethereum.Event {
   get params(): Cloned__Params {
     return new Cloned__Params(this);

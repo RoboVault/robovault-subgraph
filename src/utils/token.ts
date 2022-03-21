@@ -6,7 +6,6 @@ import { DEFAULT_DECIMALS } from '../utils/constants';
 export function getOrCreateToken(address: Address): Token {
   let id = address.toHexString();
   let token = Token.load(id);
-
   if (token == null) {
     token = new Token(id);
     let erc20Contract = ERC20.bind(address);
