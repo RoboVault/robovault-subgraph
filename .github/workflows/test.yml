@@ -36,7 +36,7 @@ jobs:
         run: yarn --frozen-lockfile
 
       - name: Build subgraph.yaml for mainnet
-        run: yarn prepare:mainnet
+        run: yarn prepare:fantom
 
       - name: Run graph codegen
         run: yarn codegen
