@@ -2,6 +2,7 @@ specVersion: 0.0.3
 schema:
   file: ./schema.graphql
 dataSources:
+
   # 1. Registry
   - kind: ethereum/contract
     name: Registry
@@ -75,6 +76,7 @@ dataSources:
   {{/registryV2Enabled}}
 
   # 3. Vaults that had strategies added before they were added to the registry (if applicable)
+
   {{#vaultsWithPreregisteredStrategies}}
   {{#comments}}
   # {{{.}}}
